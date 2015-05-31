@@ -3,10 +3,10 @@ buildscript {
         jcenter()
         maven {
             url 'http://oss.jfrog.org/artifactory/plugins-release'
-            credentials {
+/*            credentials {
                 username = "${bintrayUsername}"
                 password = "${bintrayApiKey}"
-            }
+            }*/
         }
     }
 
