@@ -1,0 +1,4 @@
+= Publish Playgound
+
+This is a playground project to learn how to automatically publish snapshot builds from travis
+
