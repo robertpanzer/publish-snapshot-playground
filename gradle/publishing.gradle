@@ -7,7 +7,12 @@ ext {
 }
 
 apply plugin: 'maven-publish'
-apply plugin: 'com.jfrog.bintray'
+if (project.version.endsWith('-SNAPSHOT')) {
+    apply plugin: 'com.jfrog.artifactory'
+} else {
+    apply plugin: 'com.jfrog.bintray'
+}
+
 
 jar {
     manifest {
@@ -72,20 +77,38 @@ publishing {
 if (!project.hasProperty('bintrayUsername')) ext.bintrayUsername = ''
 if (!project.hasProperty('bintrayApiKey')) ext.bintrayApiKey = ''
 
-bintray {
-    user = project.bintrayUsername
-    key = project.bintrayApiKey
-    publications = ['mavenCustom']
-    pkg {
-        repo = project.project_bintray_repo
-        userOrg = project.project_bintray_org
-        name = project.name
-        desc = project.project_description
-        licenses = ['Apache-2.0']
-        labels = []
-        websiteUrl = project.project_url
-        issueTrackerUrl = project.project_issues
-        vcsUrl = project.project_scm
-        publicDownloadNumbers = true
+if (project.version.endsWith('-SNAPSHOT')) {
+    artifactory {
+        contextUrl = "https://oss.jfrog.org/artifactory"
+        //The base Artifactory URL if not overridden by the publisher/resolver
+        publish {
+            repository {
+                repoKey = 'oss-snapshot-local'
+                username = "${bintrayUsername}"
+                password = "${bintrayApiKey}"
+                maven = true
+            }
+            defaults {
+                publications('mavenCustom')
+            }
+        }
+    }
+} else {
+    bintray {
+        user = project.bintrayUsername
+        key = project.bintrayApiKey
+        publications = ['mavenCustom']
+        pkg {
+            repo = 'maven'
+            userOrg = 'bobbytank42'
+            name = project.name
+            desc = project.project_description
+            licenses = ['Apache-2.0']
+            labels = []
+            websiteUrl = project.project_url
+            issueTrackerUrl = project.project_issues
+            vcsUrl = project.project_scm
+            publicDownloadNumbers = true
+        }
     }
 }
